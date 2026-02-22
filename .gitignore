@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pnp
+.pnp.js
+
+# Environment (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# IDE / editor
+.cursor/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Build / cache
+dist/
+build/
+.next/
+.expo/
+web-build/
+*.tsbuildinfo
+.metro-health-check*
+.cache/
+
+# Native / keys (mobile)
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/ios
+/android
+
+# Debug / logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Local data (optional: remove if you want to track data/)
+# data/*.db
+# data/*.sqlite
