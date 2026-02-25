@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, and_, select
 
-from ..db import get_session, init_db
+from ..db import get_session
 from ..deps import get_current_user
 from ..models import Article, ArticleKeyword, Keyword, ProcessingResult, User
 
@@ -33,7 +33,6 @@ def get_article(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> ArticleDetail:
-    init_db()
     a = session.exec(select(Article).where(and_(Article.user_id == user.id, Article.id == article_id))).first()
     if not a:
         raise HTTPException(status_code=404, detail="article not found")

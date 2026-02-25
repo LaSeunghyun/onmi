@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, and_, select
 
 from ..collect import kst_date_today, rss_google_news, search_gdelt
-from ..db import get_session, init_db
+from ..db import get_session
 from ..deps import get_current_user
 from ..models import Article, ArticleKeyword, Keyword, User
 
@@ -41,7 +41,6 @@ async def collect_today(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> CollectResponse:
-    init_db()
     day = _parse_date(date_kst)
     day_str = day.isoformat()
 

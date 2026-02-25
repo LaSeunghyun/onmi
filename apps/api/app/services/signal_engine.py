@@ -49,10 +49,14 @@ def _macd_values(closes: list[float], fast: int = 12, slow: int = 26, signal_per
     return macd_newest_first, signal_newest_first
 
 
+# MACD(EMA26) + 시그널(EMA9) 계산에 최소 26+9=35일 종가 필요
+MACD_MIN_DAYS = 35
+
+
 def _macd_signal(rows: list[StockPriceRow]) -> tuple[str | None, bool]:
     """(macd_state, golden_cross). 골든크로스=MACD선이 시그널선을 상향 돌파."""
     closes = [float(r.close) for r in rows if r.close is not None]
-    if len(closes) < 35:
+    if len(closes) < MACD_MIN_DAYS:
         return None, False
     macd_list, signal_list = _macd_values(closes)
     if len(macd_list) < 2 or len(signal_list) < 2:
@@ -92,7 +96,7 @@ def _volume_ratio(rows: list[StockPriceRow], multiplier: float = 1.5) -> float |
     avg20 = sum(vols[:20]) / 20
     if avg20 == 0:
         return None
-    return vols[0] / avg20 if vols else None
+    return vols[0] / avg20
 
 
 def compute_signal(

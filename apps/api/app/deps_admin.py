@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session, select
 
-from .db import get_session, init_db
+from .db import get_session
 from .models import AdminUser
 from .security import decode_token
 
@@ -18,7 +18,6 @@ def get_current_admin(
     creds: HTTPAuthorizationCredentials | None = Depends(admin_auth_scheme),
     session: Session = Depends(get_session),
 ) -> AdminUser:
-    init_db()
     if not creds:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="missing admin token")
     try:

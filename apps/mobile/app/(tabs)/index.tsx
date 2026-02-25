@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -27,7 +27,7 @@ export default function ReportScreen() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ReportResponse | null>(null);
 
-  async function load() {
+  const load = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     setError(null);
@@ -42,12 +42,11 @@ export default function ReportScreen() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token, dateKst, selectedKeywordId]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateKst, selectedKeywordId]);
+  }, [load]);
 
   useEffect(() => {
     if (!token) return;
@@ -247,7 +246,7 @@ const styles = StyleSheet.create({
     padding: space[4],
   },
   summaryTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: text.inverse },
-  summaryDesc: { marginTop: 6, color: 'rgba(255,255,255,0.9)' },
+  summaryDesc: { marginTop: 6, color: color.primary[100] },
   errorText: { marginTop: 8, color: text.inverse },
   chips: { paddingHorizontal: space[3], paddingVertical: space[3], gap: space[2] },
   chip: {
@@ -266,27 +265,27 @@ const styles = StyleSheet.create({
   chipText: { color: text.inverse, fontWeight: fontWeight.semibold },
   chipTextActive: { color: text.inverse },
   chipTextAlt: { color: text.primary, fontWeight: fontWeight.semibold },
-  badge: { height: 22, minWidth: 24, paddingHorizontal: 8, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  badge: { height: 22, minWidth: 24, paddingHorizontal: space[2], borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   badgeActive: { backgroundColor: surface.canvas },
-  badgeInactive: { height: 22, minWidth: 24, paddingHorizontal: 8, borderRadius: 8, backgroundColor: color.neutral[100], alignItems: 'center', justifyContent: 'center' },
-  badgeText: { fontSize: 12, fontWeight: '700' },
+  badgeInactive: { height: 22, minWidth: 24, paddingHorizontal: space[2], borderRadius: radius.sm, backgroundColor: color.neutral[100], alignItems: 'center', justifyContent: 'center' },
+  badgeText: { fontSize: fontSize.xs, fontWeight: fontWeight.extrabold },
   badgeTextActive: { color: text.secondary },
   badgeTextInactive: { color: text.tertiary },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space[6] },
   emptyTitle: { fontSize: fontSize.base, fontWeight: fontWeight.bold, color: text.primary },
   emptyDesc: { marginTop: 6, color: text.tertiary },
   retry: { marginTop: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.md, backgroundColor: color.neutral[100] },
   retryText: { color: text.primary, fontWeight: fontWeight.semibold },
-  list: { paddingHorizontal: space[3], paddingBottom: space[6], gap: 10 },
+  list: { paddingHorizontal: space[3], paddingBottom: space[6], gap: space[3] },
   card: {
-    borderRadius: 14,
+    borderRadius: radius.lg,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: border.hairline,
     backgroundColor: surface.canvas,
-    padding: 14,
+    padding: space[4],
   },
   cardTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  keywordPill: { backgroundColor: color.primary[500], paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.sm },
+  keywordPill: { backgroundColor: color.primary[500], paddingHorizontal: space[3], paddingVertical: space[1], borderRadius: radius.sm },
   keywordPillText: { color: text.inverse, fontSize: fontSize.xs, fontWeight: fontWeight.bold },
   sentiRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sentiText: { color: text.tertiary, fontSize: fontSize.xs },

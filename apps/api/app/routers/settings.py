@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, and_, select
 
-from ..db import get_session, init_db
+from ..db import get_session
 from ..deps import get_current_user
 from ..models import NotificationSetting, User
 
@@ -40,7 +40,6 @@ def get_notification_setting(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> NotificationSettingResponse:
-    init_db()
     row = session.exec(select(NotificationSetting).where(NotificationSetting.user_id == user.id)).first()
     if not row:
         return NotificationSettingResponse(daily_report_time_hhmm="09:00", is_enabled=True)
@@ -53,7 +52,6 @@ def update_notification_setting(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ) -> NotificationSettingResponse:
-    init_db()
     _validate_hhmm(body.daily_report_time_hhmm)
     row = session.exec(select(NotificationSetting).where(NotificationSetting.user_id == user.id)).first()
     now = datetime.now().astimezone()

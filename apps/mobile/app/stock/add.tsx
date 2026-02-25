@@ -15,7 +15,7 @@ import {
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { addWatchItem } from '@/lib/stocks';
-import { color, fontSize, radius, space, text } from '@/theme/tokens';
+import { color, fontSize, fontWeight, radius, space, surface, text } from '@/theme/tokens';
 
 const MAX_ITEMS = 10;
 
@@ -127,7 +127,7 @@ export default function StockAddScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, padding: space[4], backgroundColor: color.neutral[50] },
   block: { marginBottom: space[4] },
-  label: { fontSize: 14, fontWeight: '500', color: text.primary, marginBottom: space[1] },
+  label: { fontSize: fontSize.sm, fontWeight: fontWeight.medium, color: text.primary, marginBottom: space[1] },
   input: {
     borderWidth: 1,
     borderColor: color.neutral[300],
@@ -135,10 +135,10 @@ const styles = StyleSheet.create({
     padding: space[3],
     fontSize: fontSize.base,
     color: text.primary,
-    backgroundColor: '#fff',
+    backgroundColor: surface.canvas,
   },
-  hint: { fontSize: 12, color: text.tertiary, marginTop: space[1] },
-  errorText: { color: color.error[600], fontSize: 14, marginBottom: space[2] },
+  hint: { fontSize: fontSize.xs, color: text.tertiary, marginTop: space[1] },
+  errorText: { color: color.error[600], fontSize: fontSize.sm, marginBottom: space[2] },
   button: {
     backgroundColor: color.primary[500],
     padding: space[4],
@@ -147,5 +147,5 @@ const styles = StyleSheet.create({
     marginTop: space[4],
   },
   buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: '#fff', fontSize: fontSize.base, fontWeight: '600' },
+  buttonText: { color: text.inverse, fontSize: fontSize.base, fontWeight: fontWeight.semibold },
 });

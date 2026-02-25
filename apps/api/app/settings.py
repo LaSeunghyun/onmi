@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# apps/api/.env 를 실행 경로와 무관하게 로드 (Supabase 등 배포 시 동일 동작)
+_env_path = Path(__file__).resolve().parent.parent / ".env"
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_env_path,
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -24,6 +29,7 @@ class Settings(BaseSettings):
     # 주식 시세·공시 (PRD-stock-signal-notification)
     stock_price_api_key: str = ""  # 공공데이터포털 serviceKey (getStockPriceInfo)
     dart_api_key: str = ""  # DART opendart 인증키
+    max_watch_items: int = 10  # 감시종목 최대 등록 수 (PRD §3)
 
 
 settings = Settings()

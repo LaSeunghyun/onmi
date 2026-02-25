@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session, select
 
-from .db import get_session, init_db
+from .db import get_session
 from .models import User
 from .security import decode_token
 
@@ -18,7 +18,6 @@ def get_current_user(
     creds: HTTPAuthorizationCredentials | None = Depends(auth_scheme),
     session: Session = Depends(get_session),
 ) -> User:
-    init_db()
     if not creds:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="missing token")
     try:

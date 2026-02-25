@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -32,6 +32,7 @@ import {
   radius,
   signal,
   space,
+  surface,
   text,
 } from '@/theme/tokens';
 
@@ -138,7 +139,10 @@ export default function StocksScreen() {
     [token]
   );
 
-  const sigByCorp = Object.fromEntries(signals.map((s) => [s.corp_code, s]));
+  const sigByCorp = useMemo(
+    () => Object.fromEntries(signals.map((s) => [s.corp_code, s])),
+    [signals]
+  );
 
   if (!token) return null;
   if (loading) {
@@ -175,9 +179,10 @@ export default function StocksScreen() {
             <Pressable
               style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
               onPress={() =>
-                router.push(
-                  `/stock/${encodeURIComponent(item.corp_code)}` as any
-                )
+                router.push({
+                  pathname: '/stock/[corpCode]',
+                  params: { corpCode: item.corp_code },
+                })
               }
               accessibilityLabel={`${item.itms_nm || item.srtn_cd}, ${sig ? sig.signal : 'hold'} 신호`}
             >
@@ -234,7 +239,7 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: fontSize.lg, color: text.secondary, marginBottom: space[2] },
   emptySub: { fontSize: fontSize.sm, color: text.tertiary },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: surface.canvas,
     borderRadius: radius.md,
     padding: space[4],
     marginBottom: space[3],
@@ -247,11 +252,11 @@ const styles = StyleSheet.create({
   cardBody: { flex: 1, minWidth: 0 },
   name: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, color: text.primary },
   badges: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginTop: space[2] },
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.sm },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: space[1], paddingHorizontal: space[2], paddingVertical: space[1], borderRadius: radius.sm },
   badgeText: { fontSize: fontSize.xs, fontWeight: fontWeight.medium },
-  chip: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.sm },
+  chip: { paddingHorizontal: space[2], paddingVertical: space[1], borderRadius: radius.sm },
   chipText: { fontSize: fontSize.xs },
   close: { fontSize: fontSize.xs, color: text.tertiary, marginTop: space[1] },
-  footer: { padding: space[2], alignItems: 'center', borderTopWidth: 1, borderColor: color.neutral[200], backgroundColor: '#fff' },
+  footer: { padding: space[2], alignItems: 'center', borderTopWidth: 1, borderColor: color.neutral[200], backgroundColor: surface.canvas },
   footerText: { fontSize: fontSize.sm, color: text.tertiary },
 });

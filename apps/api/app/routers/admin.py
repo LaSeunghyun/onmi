@@ -14,7 +14,7 @@ from ..admin_ops import (
     set_setting,
     write_admin_audit_log,
 )
-from ..db import get_session, init_db
+from ..db import get_session
 from ..deps_admin import get_current_admin
 from ..models import (
     AdminAuditLog,
@@ -84,7 +84,6 @@ def create_member(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     email = body.email.strip().lower()
     if "@" not in email:
         raise HTTPException(status_code=400, detail="invalid email")
@@ -141,7 +140,6 @@ def list_members(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> list[dict]:
-    init_db()
     _ = admin
 
     stmt = select(User).order_by(User.created_at.desc()).limit(limit)
@@ -172,7 +170,6 @@ def get_member_detail(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     _ = admin
 
     user = session.exec(select(User).where(User.id == user_id)).first()
@@ -235,7 +232,6 @@ def update_member_status(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     if body.status not in {"active", "suspended"}:
         raise HTTPException(status_code=400, detail="invalid status")
 
@@ -271,7 +267,6 @@ def request_point_adjustment(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     if not body.reason.strip():
         raise HTTPException(status_code=400, detail="reason is required")
     if abs(body.amount) > 100000:
@@ -349,7 +344,6 @@ def approve_point_adjustment(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     req = session.exec(select(PointAdjustmentRequest).where(PointAdjustmentRequest.id == request_id)).first()
     if not req:
         raise HTTPException(status_code=404, detail="point request not found")
@@ -390,7 +384,6 @@ def list_modules(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> list[dict]:
-    init_db()
     _ = admin
     stmt = select(ServiceModule).order_by(ServiceModule.updated_at.desc())
     if not include_inactive:
@@ -416,7 +409,6 @@ def create_module(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     exists = session.exec(select(ServiceModule).where(ServiceModule.module_key == body.module_key)).first()
     if exists:
         raise HTTPException(status_code=409, detail="module_key already exists")
@@ -456,7 +448,6 @@ def update_module(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     row = session.exec(select(ServiceModule).where(ServiceModule.id == module_id)).first()
     if not row:
         raise HTTPException(status_code=404, detail="module not found")
@@ -513,7 +504,6 @@ def delete_module(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> None:
-    init_db()
     row = session.exec(select(ServiceModule).where(ServiceModule.id == module_id)).first()
     if not row:
         raise HTTPException(status_code=404, detail="module not found")
@@ -542,7 +532,6 @@ def list_audit_logs(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> list[dict]:
-    init_db()
     _ = admin
     rows = session.exec(select(AdminAuditLog).order_by(AdminAuditLog.created_at.desc()).limit(limit)).all()
     return [
@@ -566,7 +555,6 @@ def get_log_retention_setting(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     _ = admin
     value = get_setting(session, "log_retention", "permanent")
     return {"key": "log_retention", "value": value}
@@ -578,7 +566,6 @@ def update_log_retention_setting(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     value = body.value.strip().lower()
     if value != "permanent":
         if not value.startswith("days:"):

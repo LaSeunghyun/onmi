@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from ..admin_ops import ensure_default_admin, write_admin_audit_log
-from ..db import get_session, init_db
+from ..db import get_session
 from ..deps_admin import get_current_admin
 from ..models import AdminUser
 from ..security import create_access_token, hash_password, verify_password
@@ -35,7 +35,6 @@ class AdminChangePasswordRequest(BaseModel):
 
 @router.post("/login", response_model=AdminTokenResponse)
 def admin_login(body: AdminLoginRequest, session: Session = Depends(get_session)) -> AdminTokenResponse:
-    init_db()
     ensure_default_admin(session)
 
     admin = session.exec(select(AdminUser).where(AdminUser.admin_id == body.admin_id)).first()
@@ -56,7 +55,6 @@ def change_admin_password(
     admin: AdminUser = Depends(get_current_admin),
     session: Session = Depends(get_session),
 ) -> dict:
-    init_db()
     if len(body.new_password) < 8:
         raise HTTPException(status_code=400, detail="password too short")
     if not verify_password(body.current_password, admin.password_hash):

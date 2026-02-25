@@ -1,144 +1,51 @@
+"""하위 호환 re-export. 새 코드는 domains/admin/service.py 와 domains/identity/service.py 를 직접 사용하세요."""
 from __future__ import annotations
 
-import json
-from datetime import datetime
-from typing import Any
-from uuid import UUID
-
-from sqlmodel import Session, select
-
-from .models import (
-    AdminAuditLog,
-    AdminUser,
-    AppSetting,
-    MemberAccessLog,
-    MemberActionLog,
-    MemberProfile,
-)
-from .security import hash_password
+from .domains.admin.service import AdminService
+from .domains.identity.service import MemberService
 
 
-def _now() -> datetime:
-    return datetime.now().astimezone()
+def ensure_default_admin(session):
+    return AdminService.ensure_default_admin(session)
 
 
-def ensure_default_admin(session: Session) -> AdminUser:
-    row = session.exec(select(AdminUser).where(AdminUser.admin_id == "admin")).first()
-    if row:
-        return row
+def ensure_member_profile(session, user_id):
+    return MemberService.ensure_profile(session, user_id)
 
-    now = _now()
-    row = AdminUser(
-        admin_id="admin",
-        password_hash=hash_password("1234"),
-        role="super_admin",
-        must_change_password=True,
-        is_active=True,
-        created_at=now,
-        updated_at=now,
+
+def write_member_access_log(session, *, user_id, event_type, ip=None, user_agent=None):
+    return MemberService.write_access_log(
+        session, user_id=user_id, event_type=event_type, ip=ip, user_agent=user_agent
     )
-    session.add(row)
-    session.commit()
-    session.refresh(row)
-    return row
 
 
-def ensure_member_profile(session: Session, user_id: UUID) -> MemberProfile:
-    row = session.exec(select(MemberProfile).where(MemberProfile.user_id == user_id)).first()
-    if row:
-        return row
-
-    row = MemberProfile(user_id=user_id, status="active", points=0, updated_at=_now())
-    session.add(row)
-    session.commit()
-    session.refresh(row)
-    return row
-
-
-def write_member_access_log(
-    session: Session,
-    *,
-    user_id: UUID,
-    event_type: str,
-    ip: str | None = None,
-    user_agent: str | None = None,
-) -> None:
-    row = MemberAccessLog(
-        user_id=user_id,
-        event_type=event_type,
-        ip=ip,
-        user_agent=user_agent,
-        created_at=_now(),
-    )
-    session.add(row)
-    session.commit()
-
-
-def write_member_action_log(
-    session: Session,
-    *,
-    user_id: UUID,
-    action_type: str,
-    entity_type: str,
-    entity_id: UUID | None = None,
-    details: dict[str, Any] | None = None,
-) -> None:
-    row = MemberActionLog(
+def write_member_action_log(session, *, user_id, action_type, entity_type, entity_id=None, details=None):
+    return MemberService.write_action_log(
+        session,
         user_id=user_id,
         action_type=action_type,
         entity_type=entity_type,
         entity_id=entity_id,
-        details_json=json.dumps(details, ensure_ascii=False) if details else None,
-        created_at=_now(),
+        details=details,
     )
-    session.add(row)
-    session.commit()
 
 
-def write_admin_audit_log(
-    session: Session,
-    *,
-    admin_user_id: UUID,
-    action_type: str,
-    target_type: str,
-    target_id: UUID | None = None,
-    reason: str | None = None,
-    before_obj: dict[str, Any] | None = None,
-    after_obj: dict[str, Any] | None = None,
-) -> None:
-    row = AdminAuditLog(
+def write_admin_audit_log(session, *, admin_user_id, action_type, target_type, target_id=None, reason=None, before_obj=None, after_obj=None):
+    return AdminService.write_audit_log(
+        session,
         admin_user_id=admin_user_id,
         action_type=action_type,
         target_type=target_type,
         target_id=target_id,
         reason=reason,
-        before_json=json.dumps(before_obj, ensure_ascii=False) if before_obj else None,
-        after_json=json.dumps(after_obj, ensure_ascii=False) if after_obj else None,
-        created_at=_now(),
+        before_obj=before_obj,
+        after_obj=after_obj,
     )
-    session.add(row)
-    session.commit()
 
 
-def get_setting(session: Session, key: str, default_value: str) -> str:
-    row = session.exec(select(AppSetting).where(AppSetting.key == key)).first()
-    if row:
-        return row.value
-
-    row = AppSetting(key=key, value=default_value, updated_at=_now())
-    session.add(row)
-    session.commit()
-    return default_value
+def get_setting(session, key, default_value):
+    return AdminService.get_setting(session, key, default_value)
 
 
-def set_setting(session: Session, key: str, value: str) -> None:
-    row = session.exec(select(AppSetting).where(AppSetting.key == key)).first()
-    now = _now()
-    if not row:
-        row = AppSetting(key=key, value=value, updated_at=now)
-        session.add(row)
-    else:
-        row.value = value
-        row.updated_at = now
-        session.add(row)
-    session.commit()
+def set_setting(session, key, value):
+    return AdminService.set_setting(session, key, value)

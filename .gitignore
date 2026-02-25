@@ -46,6 +46,10 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
+# Local Claude / MCP config (may contain secrets)
+.mcp.json
+.claude/settings.local.json
+
 # Local data (optional: remove if you want to track data/)
 # data/*.db
 # data/*.sqlite
