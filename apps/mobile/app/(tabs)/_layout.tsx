@@ -21,7 +21,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: useClientOnlyValue(false, true),
+        // Disable the static render of the header on web
+        // to prevent a hydration error in React Navigation v6.
+        headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
@@ -57,20 +59,6 @@ export default function TabLayout() {
         options={{
           title: '감시종목',
           tabBarIcon: ({ color }) => <TabBarIcon name="line-chart" color={color} />,
-          headerRight: () => (
-            <Link href="/(tabs)/search" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="search"
-                    size={20}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
         }}
       />
       <Tabs.Screen

@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -13,7 +14,7 @@ import {
 
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { searchStocks, type CorpSearchItem } from '@/lib/stocks';
+import { addWatchItem, searchStocks, type CorpSearchItem } from '@/lib/stocks';
 import { color, fontSize, fontWeight, radius, space, surface, text } from '@/theme/tokens';
 
 const DEBOUNCE_MS = 400;
@@ -58,14 +59,40 @@ export default function StockSearchScreen() {
 
   const onSelect = useCallback(
     (item: CorpSearchItem) => {
-      const params = new URLSearchParams({
-        corp_code: item.corp_code,
-        srtn_cd: item.stock_code,
-        itms_nm: item.corp_name,
-      });
-      router.push((`/stock/add?${params.toString()}` as any) as never);
+      Alert.alert(
+        '감시종목 추가',
+        `"${item.corp_name}"을(를) 감시종목에 추가하시겠습니까?`,
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '추가',
+            style: 'default',
+            onPress: async () => {
+              if (!token) return;
+              try {
+                await addWatchItem(token, {
+                  corp_code: item.corp_code,
+                  srtn_cd: item.stock_code,
+                  itms_nm: item.corp_name,
+                });
+                Alert.alert('추가 완료', '감시종목에 추가되었습니다.');
+              } catch (e) {
+                const msg =
+                  typeof e === 'object' && e && 'message' in e
+                    ? String((e as ApiError).message)
+                    : '등록 실패';
+                if (typeof e === 'object' && e && 'status' in e && (e as ApiError).status === 400) {
+                  Alert.alert('등록 불가', '감시종목은 최대 10개까지입니다.');
+                } else {
+                  Alert.alert('오류', msg);
+                }
+              }
+            },
+          },
+        ]
+      );
     },
-    [router]
+    [token]
   );
 
   if (!token) return null;
