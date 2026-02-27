@@ -12,7 +12,7 @@ class WatchItem(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("user_id", "corp_code"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     corp_code: str = Field(max_length=8, index=True)  # DART 공시대상회사 고유번호 8자리
     srtn_cd: str = Field(max_length=9, index=True)  # 종목코드 6자리 (시세 API용)
     itms_nm: Optional[str] = Field(default=None, max_length=120)
@@ -26,7 +26,7 @@ class SignalRuleConfig(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("user_id"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     stop_loss_pct: Optional[float] = Field(default=None)  # 손절 % (예: -3.0)
     take_profit_pct: Optional[float] = Field(default=None)  # 익절 % (예: 7.0)
     ema_slope_threshold: float = Field(default=0.0)  # 25일 EMA 기울기 최소값
@@ -48,7 +48,7 @@ class PushToken(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("user_id"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     token: str = Field(index=True)
     updated_at: datetime = Field(default_factory=lambda: datetime.now().astimezone(), index=True)
 
@@ -56,7 +56,7 @@ class PushToken(SQLModel, table=True):
 class SignalEventLog(SQLModel, table=True):
     """신호 전환·푸시 발송 이력 (전량 로그)."""
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     corp_code: str = Field(max_length=8, index=True)
     signal_type: str = Field(index=True)  # buy | sell | hold
     reason_codes: Optional[str] = Field(default=None)  # JSON

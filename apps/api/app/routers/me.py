@@ -3,7 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 
 from ..deps import get_current_user
-from ..models import User, UserPublic
+from ..domains.identity.models import User
+from ..domains.identity.schemas import UserPublic
 
 
 router = APIRouter(tags=["me"])

@@ -66,7 +66,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="plus"
                     size={22}
-                    color={Colors[useColorScheme() ?? 'light'].text}
+                    color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}

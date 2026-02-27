@@ -10,7 +10,7 @@ from sqlmodel import Field, SQLModel
 
 class Keyword(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     text: str = Field(index=True)
     is_active: bool = Field(default=True, index=True)
     is_pinned: bool = Field(default=False, index=True)
@@ -23,7 +23,7 @@ class Article(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("user_id", "canonical_url"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     date_kst: str = Field(index=True)  # YYYY-MM-DD
 
     canonical_url: str = Field(index=True)
@@ -44,16 +44,16 @@ class ArticleKeyword(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("article_id", "keyword_id"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    article_id: UUID = Field(index=True)
-    keyword_id: UUID = Field(index=True)
+    article_id: UUID = Field(foreign_key="article.id", index=True)
+    keyword_id: UUID = Field(foreign_key="keyword.id", index=True)
 
 
 class ProcessingResult(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("article_id"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
-    article_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
+    article_id: UUID = Field(foreign_key="article.id", index=True)
 
     sentiment: str = Field(index=True)  # positive | neutral | negative
     sentiment_confidence: Optional[float] = None
@@ -71,7 +71,7 @@ class NotificationSetting(SQLModel, table=True):
     __table_args__ = (UniqueConstraint("user_id"),)
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    user_id: UUID = Field(index=True)
+    user_id: UUID = Field(foreign_key="user.id", index=True)
     daily_report_time_hhmm: str = Field(default="09:00", index=True)
     is_enabled: bool = Field(default=True, index=True)
     updated_at: datetime = Field(default_factory=lambda: datetime.now().astimezone(), index=True)
