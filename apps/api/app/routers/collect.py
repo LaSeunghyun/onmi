@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, and_, select
 
 from ..collect import kst_date_today, rss_google_news, search_gdelt
@@ -102,7 +103,7 @@ async def collect_today(
                 link_row = ArticleKeyword(article_id=article.id, keyword_id=kw.id)
                 session.add(link_row)
                 session.commit()
-            except Exception:
+            except IntegrityError:
                 session.rollback()
 
     return CollectResponse(

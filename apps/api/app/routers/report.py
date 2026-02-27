@@ -93,27 +93,45 @@ def get_report(
         )
     articles = session.exec(stmt.order_by(Article.published_at.desc().nullslast(), Article.fetched_at.desc())).all()
 
+    if not articles:
+        return ReportResponse(date_kst=day_str, keywords=kw_counts, total_articles=0, items=[])
+
+    article_ids = [a.id for a in articles]
+
+    # Batch: ProcessingResult for all articles at once (replaces N+1)
+    pr_rows = session.exec(
+        select(ProcessingResult).where(
+            and_(ProcessingResult.user_id == user.id, ProcessingResult.article_id.in_(article_ids))
+        )
+    ).all()
+    pr_by_article: dict[UUID, ProcessingResult] = {pr.article_id: pr for pr in pr_rows}
+
+    # Batch: ArticleKeyword + Keyword for all articles at once (replaces N+1)
+    kw_by_id: dict[UUID, Keyword] = {k.id: k for k in kw_rows}
+    selected_kw: Keyword | None = kw_by_id.get(keyword_id) if keyword_id else None
+
+    # Pre-build article→primary keyword mapping
+    primary_kw_map: dict[UUID, Keyword | None] = {}
+    if keyword_id:
+        for a in articles:
+            primary_kw_map[a.id] = selected_kw
+    else:
+        all_links = session.exec(
+            select(ArticleKeyword).where(ArticleKeyword.article_id.in_(article_ids))
+        ).all()
+        links_by_article: dict[UUID, list[UUID]] = {}
+        for link in all_links:
+            links_by_article.setdefault(link.article_id, []).append(link.keyword_id)
+        for a in articles:
+            kw_ids = links_by_article.get(a.id, [])
+            kws = [kw_by_id[kid] for kid in kw_ids if kid in kw_by_id]
+            kws.sort(key=lambda k: (not k.is_pinned, k.text.lower()))
+            primary_kw_map[a.id] = kws[0] if kws else None
+
     items: list[ReportItem] = []
     for a in articles:
-        pr = session.exec(
-            select(ProcessingResult).where(and_(ProcessingResult.user_id == user.id, ProcessingResult.article_id == a.id))
-        ).first()
-
-        # choose primary keyword for display
-        if keyword_id:
-            kw = session.exec(select(Keyword).where(and_(Keyword.user_id == user.id, Keyword.id == keyword_id))).first()
-        else:
-            links = session.exec(select(ArticleKeyword).where(ArticleKeyword.article_id == a.id)).all()
-            kw_ids = [l.keyword_id for l in links]
-            kws = (
-                session.exec(select(Keyword).where(and_(Keyword.user_id == user.id, Keyword.id.in_(kw_ids))))
-                .all()
-                if kw_ids
-                else []
-            )
-            kws.sort(key=lambda k: (not k.is_pinned, k.text.lower()))
-            kw = kws[0] if kws else None
-
+        pr = pr_by_article.get(a.id)
+        kw = primary_kw_map.get(a.id)
         items.append(
             ReportItem(
                 article_id=a.id,

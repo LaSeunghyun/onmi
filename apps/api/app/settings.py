@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expires_minutes: int = 60 * 24 * 7
 
+    # CORS 허용 origins (콤마 구분). 비어있으면 개발 모드로 전체 허용.
+    allowed_origins: str = ""
+
     collector_mode: str = "live"  # live | mock
 
     processor_mode: str = "mock"  # mock | openai

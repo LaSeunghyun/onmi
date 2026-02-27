@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -20,8 +20,19 @@ import { color, border, fontSize, fontWeight, radius, space, surface, text } fro
 export default function ReportScreen() {
   const { token, consumePendingReportDateKst } = useAuth();
   const router = useRouter();
-  const today = useMemo(() => toKstDateString(new Date()), []);
+  const [today, setToday] = useState(() => toKstDateString(new Date()));
   const [dateKst, setDateKst] = useState(today);
+
+  // 화면 포커스 시 날짜가 바뀌었으면 today를 갱신
+  useFocusEffect(
+    useCallback(() => {
+      const now = toKstDateString(new Date());
+      if (now !== today) {
+        setToday(now);
+        setDateKst(now);
+      }
+    }, [today])
+  );
   const [selectedKeywordId, setSelectedKeywordId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

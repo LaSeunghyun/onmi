@@ -36,7 +36,7 @@ class ServiceModule(SQLModel, table=True):
 
 class AdminAuditLog(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    admin_user_id: UUID = Field(index=True)
+    admin_user_id: UUID = Field(foreign_key="adminuser.id", index=True)
     action_type: str = Field(index=True)
     target_type: str = Field(index=True)
     target_id: Optional[UUID] = Field(default=None, index=True)
@@ -57,11 +57,11 @@ class AppSetting(SQLModel, table=True):
 
 class PointAdjustmentRequest(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
-    member_user_id: UUID = Field(index=True)
+    member_user_id: UUID = Field(foreign_key="user.id", index=True)
     amount: int
     reason: str
-    requested_by_admin_id: UUID = Field(index=True)
-    approved_by_admin_id: Optional[UUID] = Field(default=None, index=True)
+    requested_by_admin_id: UUID = Field(foreign_key="adminuser.id", index=True)
+    approved_by_admin_id: Optional[UUID] = Field(default=None, foreign_key="adminuser.id", index=True)
     status: str = Field(default="requested", index=True)  # requested | approved | rejected | applied
     created_at: datetime = Field(default_factory=lambda: datetime.now().astimezone(), index=True)
     updated_at: datetime = Field(default_factory=lambda: datetime.now().astimezone(), index=True)

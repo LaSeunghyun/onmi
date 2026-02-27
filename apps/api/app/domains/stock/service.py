@@ -1,7 +1,9 @@
 """주식 감시종목·신호 규칙·대시보드 Application Service."""
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -89,9 +91,10 @@ class WatchlistService:
         if existing:
             raise HTTPException(status_code=409, detail="이미 등록된 종목")
 
-        max_order = 0
-        for r in session.exec(select(WatchItem).where(WatchItem.user_id == user_id)):
-            max_order = max(max_order, r.sort_order)
+        max_order = session.exec(
+            select(func.coalesce(func.max(WatchItem.sort_order), 0))
+            .where(WatchItem.user_id == user_id)
+        ).one()
 
         item = WatchItem(
             user_id=user_id,
@@ -213,6 +216,18 @@ class SignalRuleService:
 
 class SignalDashboardService:
     @staticmethod
+    def _fetch_stock_data(
+        stock_client: StockPriceClient,
+        dart_client: DartClient,
+        srtn_cd: str,
+        corp_code: str,
+    ) -> dict[str, Any]:
+        """외부 API 호출 (스레드 풀에서 병렬 실행)."""
+        rows_list = stock_client.fetch(srtn_cd, num_days=50) if stock_client.is_configured() else []
+        d_list = dart_client.fetch_list(corp_code, page_count=5) if dart_client.is_configured() else []
+        return {"rows_list": rows_list, "d_list": d_list}
+
+    @staticmethod
     def compute_all(session: Session, user_id: UUID) -> list[SignalItemPublic]:
         items = list(
             session.exec(
@@ -240,20 +255,38 @@ class SignalDashboardService:
             session.add(usage)
             session.commit()
             session.refresh(usage)
-        base_count = usage.call_count
+
+        # 외부 API 호출을 스레드 풀에서 병렬 실행
+        fetched: dict[str, dict[str, Any]] = {}
+        with ThreadPoolExecutor(max_workers=min(len(items), 5)) as pool:
+            futures = {
+                pool.submit(
+                    SignalDashboardService._fetch_stock_data,
+                    stock_client, dart_client, w.srtn_cd, w.corp_code,
+                ): w.corp_code
+                for w in items
+            }
+            for future in as_completed(futures):
+                corp_code = futures[future]
+                try:
+                    fetched[corp_code] = future.result()
+                except Exception:
+                    fetched[corp_code] = {"rows_list": [], "d_list": []}
+
+        api_call_count = sum(1 for w in items if stock_client.is_configured())
 
         result: list[SignalItemPublic] = []
         for w in items:
+            data = fetched.get(w.corp_code, {"rows_list": [], "d_list": []})
+            rows_list = data["rows_list"]
+            d_list = data["d_list"]
+
             last_close: int | None = None
             last_bas_dt: str | None = None
             signal = "hold"
             reasons: list[str] = ["시세 API 미설정 또는 조회 실패"]
-            rows_list = []
 
             if stock_client.is_configured():
-                # MACD(26+9) + 골든크로스 비교용 2일 = 최소 35일 필요 → 여유있게 50일 조회
-                rows_list = stock_client.fetch(w.srtn_cd, num_days=50)
-                base_count += 1
                 if rows_list:
                     last_close = rows_list[0].close
                     last_bas_dt = getattr(rows_list[0], "bas_dt", None) or ""
@@ -274,10 +307,8 @@ class SignalDashboardService:
 
             disclosure_sentiment: str | None = None
             disclosure_summary: str | None = None
-            if dart_client.is_configured():
-                d_list = dart_client.fetch_list(w.corp_code, page_count=5)
-                if d_list:
-                    disclosure_sentiment, disclosure_summary = classify_sentiment(d_list[0])
+            if d_list:
+                disclosure_sentiment, disclosure_summary = classify_sentiment(d_list[0])
 
             result.append(
                 SignalItemPublic(
@@ -293,7 +324,7 @@ class SignalDashboardService:
                 )
             )
 
-        usage.call_count = base_count
+        usage.call_count = usage.call_count + api_call_count
         session.add(usage)
         session.commit()
         return result

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { apiRequest } from '@/lib/api';
 import { deleteStoredValue, getStoredValue, setStoredValue } from '@/lib/storage';
@@ -30,7 +30,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [pendingReportDateKst, setPendingReportDateKst] = useState<string | null>(null);
+  const pendingReportDateKstRef = useRef<string | null>(null);
+
+  const setPendingReportDateKst = useCallback((dateKst: string) => {
+    pendingReportDateKstRef.current = dateKst;
+  }, []);
+
+  const consumePendingReportDateKst = useCallback(() => {
+    const v = pendingReportDateKstRef.current;
+    pendingReportDateKstRef.current = null;
+    return v;
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,16 +102,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(null);
         setUser(null);
       },
-      setPendingReportDateKst(dateKst: string) {
-        setPendingReportDateKst(dateKst);
-      },
-      consumePendingReportDateKst() {
-        const v = pendingReportDateKst;
-        setPendingReportDateKst(null);
-        return v;
-      },
+      setPendingReportDateKst,
+      consumePendingReportDateKst,
     }),
-    [loading, token, user, pendingReportDateKst]
+    [loading, token, user, setPendingReportDateKst, consumePendingReportDateKst]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
