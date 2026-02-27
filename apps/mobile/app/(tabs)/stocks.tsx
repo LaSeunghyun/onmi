@@ -169,8 +169,16 @@ export default function StocksScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.empty}>
+            <FontAwesome name="line-chart" size={40} color={color.neutral[300]} style={styles.emptyIcon} />
             <Text style={styles.emptyText}>감시종목을 추가해 보세요.</Text>
             <Text style={styles.emptySub}>최대 10종목까지 등록할 수 있습니다.</Text>
+            <Pressable
+              style={({ pressed }) => [styles.emptyButton, pressed && styles.emptyButtonPressed]}
+              onPress={() => router.push('/(tabs)/search' as any)}
+            >
+              <FontAwesome name="search" size={14} color={text.inverse} />
+              <Text style={styles.emptyButtonText}>종목 검색하러 가기</Text>
+            </Pressable>
           </View>
         }
         renderItem={({ item }) => {
@@ -236,8 +244,20 @@ const styles = StyleSheet.create({
   errorText: { color: color.error[700], fontSize: fontSize.sm },
   listContent: { padding: space[4], paddingBottom: space[8] },
   empty: { padding: space[8], alignItems: 'center' },
-  emptyText: { fontSize: fontSize.lg, color: text.secondary, marginBottom: space[2] },
-  emptySub: { fontSize: fontSize.sm, color: text.tertiary },
+  emptyIcon: { marginBottom: space[4] },
+  emptyText: { fontSize: fontSize.lg, color: text.secondary, marginBottom: space[2], fontWeight: fontWeight.semibold },
+  emptySub: { fontSize: fontSize.sm, color: text.tertiary, marginBottom: space[5] },
+  emptyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[2],
+    paddingHorizontal: space[5],
+    paddingVertical: 12,
+    borderRadius: radius.md,
+    backgroundColor: color.primary[500],
+  },
+  emptyButtonPressed: { opacity: 0.85 },
+  emptyButtonText: { color: text.inverse, fontWeight: fontWeight.semibold, fontSize: fontSize.sm },
   card: {
     backgroundColor: surface.canvas,
     borderRadius: radius.md,

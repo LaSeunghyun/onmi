@@ -1,9 +1,34 @@
-import { Link, Slot, useRouter, useSegments } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Slot, useRouter, useSegments } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useAdminAuth } from '@/lib/adminAuth';
-import { color, fontSize, fontWeight, radius, space, text } from '@/theme/tokens';
+import { color, fontSize, fontWeight, radius, text } from '@/theme/tokens';
+
+type MCIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+interface NavItemDef {
+  href: string;
+  label: string;
+  icon: MCIconName;
+  key: string;
+}
+
+const MAIN_ITEMS: NavItemDef[] = [
+  { href: '/admin/dashboard', label: '대시보드', icon: 'view-dashboard-outline', key: 'dashboard' },
+];
+
+const ADMIN_ITEMS: NavItemDef[] = [
+  { href: '/admin/members', label: '회원관리', icon: 'account-group-outline', key: 'members' },
+  { href: '/admin/modules', label: '모듈관리', icon: 'puzzle-outline', key: 'modules' },
+  { href: '/admin/audit', label: '로그관리', icon: 'clipboard-text-outline', key: 'audit' },
+  { href: '/admin/settings', label: '설정', icon: 'cog-outline', key: 'settings' },
+];
+
+const ACTIVE_COLOR = '#22D3EE';
+const INACTIVE_ICON_COLOR = '#64748B';
+const INACTIVE_TEXT_COLOR = '#94A3B8';
 
 export default function AdminLayout() {
   const { loading, token, signOut } = useAdminAuth();
@@ -26,6 +51,26 @@ export default function AdminLayout() {
 
   const active = segments[1] ?? 'dashboard';
 
+  function renderNavItem(item: NavItemDef) {
+    const isActive = active === item.key;
+    return (
+      <Pressable
+        key={item.key}
+        accessibilityLabel={item.label}
+        accessibilityRole="link"
+        style={[styles.navItem, isActive && styles.navItemActive]}
+        onPress={() => router.push(item.href as any)}
+      >
+        <MaterialCommunityIcons
+          name={item.icon}
+          size={16}
+          color={isActive ? ACTIVE_COLOR : INACTIVE_ICON_COLOR}
+        />
+        <Text style={[styles.navText, isActive && styles.navTextActive]}>{item.label}</Text>
+      </Pressable>
+    );
+  }
+
   return (
     <View style={styles.page}>
       {!inAdminLogin ? (
@@ -33,32 +78,19 @@ export default function AdminLayout() {
           <View style={styles.sidebar}>
             <View style={styles.brandWrap}>
               <View style={styles.brandIcon}>
-                <Text style={styles.brandIconText}>◌</Text>
+                <MaterialCommunityIcons name="circle-outline" size={18} color="#FFFFFF" />
               </View>
               <View>
                 <Text style={styles.brandTitle}>관리자</Text>
-                <Text style={styles.brandSub}>Admin</Text>
+                <Text style={styles.brandSub}>Admin Console</Text>
               </View>
             </View>
 
             <Text style={styles.sectionLabel}>MAIN</Text>
-            <Link href="/admin/dashboard" style={[styles.navLink, active === 'dashboard' && styles.navLinkActive]}>
-              대시보드
-            </Link>
+            {MAIN_ITEMS.map(renderNavItem)}
 
-            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>ADMIN</Text>
-            <Link href="/admin/members" style={[styles.navLink, active === 'members' && styles.navLinkActive]}>
-              회원관리
-            </Link>
-            <Link href="/admin/modules" style={[styles.navLink, active === 'modules' && styles.navLinkActive]}>
-              모듈관리
-            </Link>
-            <Link href="/admin/audit" style={[styles.navLink, active === 'audit' && styles.navLinkActive]}>
-              로그관리
-            </Link>
-            <Link href="/admin/settings" style={[styles.navLink, active === 'settings' && styles.navLinkActive]}>
-              설정
-            </Link>
+            <Text style={[styles.sectionLabel, { marginTop: 22 }]}>ADMIN</Text>
+            {ADMIN_ITEMS.map(renderNavItem)}
 
             <Pressable
               accessibilityLabel="로그아웃"
@@ -66,9 +98,11 @@ export default function AdminLayout() {
               style={styles.logoutBtn}
               onPress={signOut}
             >
+              <MaterialCommunityIcons name="logout" size={14} color="#475569" />
               <Text style={styles.logoutText}>로그아웃</Text>
             </Pressable>
           </View>
+
           <View style={styles.main}>
             <View style={styles.topbar}>
               <TextInput
@@ -78,7 +112,12 @@ export default function AdminLayout() {
                 style={styles.searchInput}
               />
               <View style={styles.topIcons}>
-                <Text style={styles.bell} accessibilityLabel="알림">🔔</Text>
+                <MaterialCommunityIcons
+                  name="bell-outline"
+                  size={20}
+                  color={color.neutral[500]}
+                  accessibilityLabel="알림"
+                />
                 <View style={styles.avatar} accessibilityLabel="프로필" />
               </View>
             </View>
@@ -94,17 +133,23 @@ export default function AdminLayout() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, flexDirection: 'row', backgroundColor: '#DCE1E8' },
+  page: { flex: 1, flexDirection: 'row', backgroundColor: '#F1F5F9' },
   sidebar: {
-    width: 198,
-    backgroundColor: '#1F2E46',
-    paddingHorizontal: 10,
-    paddingTop: 18,
-    paddingBottom: 12,
+    width: 210,
+    backgroundColor: '#0F172A',
+    paddingHorizontal: 12,
+    paddingTop: 20,
+    paddingBottom: 16,
     borderRightWidth: 1,
-    borderRightColor: '#2B3B57',
+    borderRightColor: '#1E293B',
   },
-  brandWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 22, paddingHorizontal: 8 },
+  brandWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 28,
+    paddingHorizontal: 6,
+  },
   brandIcon: {
     width: 36,
     height: 36,
@@ -113,26 +158,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandIconText: { color: '#FFFFFF', fontWeight: fontWeight.bold },
-  brandTitle: { color: '#FFFFFF', fontWeight: fontWeight.bold, fontSize: fontSize.base },
-  brandSub: { color: '#8EA0BF', fontSize: fontSize.xs },
-  sectionLabel: { color: '#7E91AF', fontSize: 11, fontWeight: fontWeight.semibold, marginBottom: 8, paddingHorizontal: 8 },
-  navLink: {
-    color: '#D4DEEE',
-    height: 36,
-    borderRadius: radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 6,
-    fontSize: fontSize.sm,
-  },
-  navLinkActive: {
-    backgroundColor: '#06B6D4',
-    color: '#FFFFFF',
+  brandTitle: { color: '#F8FAFC', fontWeight: fontWeight.bold, fontSize: fontSize.base },
+  brandSub: { color: '#475569', fontSize: fontSize.xs },
+  sectionLabel: {
+    color: '#334155',
+    fontSize: 10,
     fontWeight: fontWeight.semibold,
-    shadowColor: '#06B6D4',
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
+    letterSpacing: 1,
+    marginBottom: 6,
+    paddingHorizontal: 10,
+  },
+  navItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 38,
+    borderRadius: radius.md,
+    paddingHorizontal: 10,
+    marginBottom: 2,
+    borderLeftWidth: 3,
+    borderLeftColor: 'transparent',
+  },
+  navItemActive: {
+    borderLeftColor: ACTIVE_COLOR,
+    backgroundColor: 'rgba(34, 211, 238, 0.07)',
+  },
+  navText: {
+    color: INACTIVE_TEXT_COLOR,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+  },
+  navTextActive: {
+    color: ACTIVE_COLOR,
+    fontWeight: fontWeight.semibold,
   },
   main: { flex: 1 },
   topbar: {
@@ -146,8 +204,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchInput: {
-    width: 444,
-    maxWidth: '72%',
+    width: 440,
+    maxWidth: '60%',
     height: 34,
     borderRadius: radius.sm,
     borderWidth: 1,
@@ -158,18 +216,18 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   topIcons: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  bell: { fontSize: 18 },
   avatar: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: '#0EA5E9' },
-  content: { flex: 1, minHeight: 400, paddingHorizontal: 22, paddingVertical: 18 },
+  content: { flex: 1, minHeight: 400, paddingHorizontal: 24, paddingVertical: 20 },
   logoutBtn: {
     marginTop: 'auto',
     height: 36,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: '#32435F',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    borderColor: '#1E293B',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     paddingHorizontal: 12,
   },
-  logoutText: { color: '#D4DEEE', fontWeight: fontWeight.medium, fontSize: fontSize.sm },
+  logoutText: { color: '#475569', fontWeight: fontWeight.medium, fontSize: fontSize.sm },
 });

@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   SectionList,
   StyleSheet,
@@ -125,7 +127,11 @@ export default function KeywordsScreen() {
   }
 
   return (
-    <View style={styles.page}>
+    <KeyboardAvoidingView
+      style={styles.page}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={90}
+    >
       <View style={styles.topBar}>
         <TextInput
           style={styles.search}
@@ -136,20 +142,6 @@ export default function KeywordsScreen() {
         />
       </View>
 
-      <View style={styles.addRow}>
-        <TextInput
-          style={styles.addInput}
-          placeholder="키워드 추가"
-          value={newText}
-          onChangeText={setNewText}
-          onSubmitEditing={onAdd}
-          returnKeyType="done"
-        />
-        <Pressable style={styles.addButton} onPress={onAdd}>
-          <FontAwesome name="plus" size={18} color={text.inverse} />
-        </Pressable>
-      </View>
-
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator />
@@ -157,7 +149,7 @@ export default function KeywordsScreen() {
       ) : items.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.emptyTitle}>키워드가 없어요</Text>
-          <Text style={styles.emptyDesc}>추가하면 일일 리포트가 만들어집니다.</Text>
+          <Text style={styles.emptyDesc}>아래에 키워드를 입력하면 일일 리포트가 만들어집니다.</Text>
         </View>
       ) : (
         <SectionList
@@ -185,7 +177,21 @@ export default function KeywordsScreen() {
           refreshing={loading}
         />
       )}
-    </View>
+
+      <View style={styles.addBar}>
+        <TextInput
+          style={styles.addInput}
+          placeholder="새 키워드 입력"
+          value={newText}
+          onChangeText={setNewText}
+          onSubmitEditing={onAdd}
+          returnKeyType="done"
+        />
+        <Pressable style={styles.addButton} onPress={onAdd}>
+          <FontAwesome name="plus" size={18} color={text.inverse} />
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -198,17 +204,25 @@ const styles = StyleSheet.create({
     backgroundColor: color.neutral[100],
     paddingHorizontal: space[3],
   },
-  addRow: { flexDirection: 'row', gap: space[2], paddingHorizontal: space[3], paddingBottom: space[2] },
+  addBar: {
+    flexDirection: 'row',
+    gap: space[2],
+    paddingHorizontal: space[3],
+    paddingVertical: space[3],
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: border.subtle,
+    backgroundColor: surface.canvas,
+  },
   addInput: {
     flex: 1,
-    height: 40,
+    height: 44,
     borderRadius: radius.md,
     backgroundColor: color.neutral[100],
     paddingHorizontal: space[3],
   },
   addButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.md,
     backgroundColor: color.primary[500],
     alignItems: 'center',
@@ -216,18 +230,18 @@ const styles = StyleSheet.create({
   },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   emptyTitle: { fontSize: fontSize.base, fontWeight: fontWeight.semibold, color: text.primary },
-  emptyDesc: { marginTop: 6, color: text.tertiary },
+  emptyDesc: { marginTop: 6, color: text.tertiary, textAlign: 'center' },
   listContent: { paddingHorizontal: space[3], paddingBottom: space[6] },
   sectionTitle: { marginTop: 14, marginBottom: 8, color: text.tertiary, fontWeight: fontWeight.semibold },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: border.subtle,
   },
-  pin: { width: 28, alignItems: 'center' },
+  pin: { width: 32, alignItems: 'center' },
   text: { flex: 1, color: text.primary, fontSize: fontSize.sm },
-  trash: { paddingLeft: 6, paddingRight: 2 },
+  trash: { paddingLeft: space[5], paddingRight: 2 },
 });

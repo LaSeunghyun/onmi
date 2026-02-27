@@ -14,7 +14,7 @@ import {
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { searchStocks, type CorpSearchItem } from '@/lib/stocks';
-import { color, fontSize, fontWeight, radius, space, text } from '@/theme/tokens';
+import { color, fontSize, fontWeight, radius, space, surface, text } from '@/theme/tokens';
 
 const DEBOUNCE_MS = 400;
 
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: surface.canvas,
     borderBottomWidth: 1,
     borderBottomColor: color.neutral[200],
     paddingHorizontal: space[4],
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: surface.canvas,
     padding: space[4],
     marginBottom: space[2],
     borderRadius: radius.md,

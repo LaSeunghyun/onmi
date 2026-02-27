@@ -168,15 +168,31 @@ export default function ReportScreen() {
   );
 }
 
-function sentimentLabel(s: string | null) {
-  if (!s) return { text: '처리중', icon: 'clock-o' as const };
-  if (s === 'positive') return { text: '긍정', icon: 'thumbs-up' as const };
-  if (s === 'negative') return { text: '부정', icon: 'thumbs-down' as const };
-  return { text: '중립', icon: 'minus' as const };
+const SENTI_CONFIG: Record<string, { label: string; icon: React.ComponentProps<typeof FontAwesome>['name']; bg: string; fg: string }> = {
+  positive: { label: '긍정', icon: 'thumbs-up', bg: color.success[600] + '20', fg: color.success[600] },
+  negative: { label: '부정', icon: 'thumbs-down', bg: color.error[600] + '20', fg: color.error[600] },
+  neutral: { label: '중립', icon: 'minus', bg: color.neutral[200], fg: color.neutral[600] },
+};
+
+function SentimentBadge({ sentiment }: { sentiment: string | null }) {
+  const cfg = sentiment ? (SENTI_CONFIG[sentiment] ?? null) : null;
+  if (!cfg) {
+    return (
+      <View style={[styles.sentiBadge, { backgroundColor: color.neutral[100] }]}>
+        <FontAwesome name="clock-o" size={11} color={color.neutral[500]} />
+        <Text style={[styles.sentiBadgeText, { color: color.neutral[500] }]}>처리중</Text>
+      </View>
+    );
+  }
+  return (
+    <View style={[styles.sentiBadge, { backgroundColor: cfg.bg }]}>
+      <FontAwesome name={cfg.icon} size={11} color={cfg.fg} />
+      <Text style={[styles.sentiBadgeText, { color: cfg.fg }]}>{cfg.label}</Text>
+    </View>
+  );
 }
 
 function ArticleCard({ item, onPress }: { item: ReportItem; onPress: () => void }) {
-  const senti = sentimentLabel(item.sentiment);
   return (
     <Pressable style={styles.card} onPress={onPress}>
       <View style={styles.cardTopRow}>
@@ -185,10 +201,7 @@ function ArticleCard({ item, onPress }: { item: ReportItem; onPress: () => void 
             <Text style={styles.keywordPillText}>{item.keyword_text}</Text>
           </View>
         ) : null}
-        <View style={styles.sentiRow}>
-          <FontAwesome name={senti.icon} size={14} color={text.tertiary} />
-          <Text style={styles.sentiText}>{senti.text}</Text>
-        </View>
+        <SentimentBadge sentiment={item.sentiment} />
       </View>
 
       <Text style={styles.cardTitle} numberOfLines={2}>
@@ -214,8 +227,8 @@ const styles = StyleSheet.create({
   headerPad: { height: 6 },
   dateRow: { flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[3], paddingTop: 10 },
   iconButton: {
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     borderRadius: radius.sm,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: border.hairline,
@@ -242,12 +255,14 @@ const styles = StyleSheet.create({
     marginTop: space[3],
     marginHorizontal: space[3],
     borderRadius: radius.lg,
-    backgroundColor: color.primary[500],
+    backgroundColor: color.primary[50],
+    borderWidth: 1,
+    borderColor: color.primary[100],
     padding: space[4],
   },
-  summaryTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: text.inverse },
-  summaryDesc: { marginTop: 6, color: color.primary[100] },
-  errorText: { marginTop: 8, color: text.inverse },
+  summaryTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: color.primary[700] },
+  summaryDesc: { marginTop: 6, color: color.primary[600] },
+  errorText: { marginTop: 8, color: color.error[600] },
   chips: { paddingHorizontal: space[3], paddingVertical: space[3], gap: space[2] },
   chip: {
     height: 32,
@@ -255,7 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: border.hairline,
-    backgroundColor: surface.canvas,
+    backgroundColor: color.neutral[100],
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[2],
@@ -287,8 +302,8 @@ const styles = StyleSheet.create({
   cardTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   keywordPill: { backgroundColor: color.primary[500], paddingHorizontal: space[3], paddingVertical: space[1], borderRadius: radius.sm },
   keywordPillText: { color: text.inverse, fontSize: fontSize.xs, fontWeight: fontWeight.bold },
-  sentiRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  sentiText: { color: text.tertiary, fontSize: fontSize.xs },
+  sentiBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space[2], paddingVertical: 3, borderRadius: radius.sm },
+  sentiBadgeText: { fontSize: fontSize.xs, fontWeight: fontWeight.medium },
   cardTitle: { marginTop: 10, fontSize: fontSize.base, fontWeight: fontWeight.bold, color: text.primary },
   cardMeta: { marginTop: 6, fontSize: fontSize.xs, color: text.tertiary },
   cardBody: { marginTop: 10, fontSize: fontSize.sm, color: text.secondary, lineHeight: 20 },

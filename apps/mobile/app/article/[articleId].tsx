@@ -5,7 +5,7 @@ import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'r
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { ArticleDetail, getArticle } from '@/lib/report';
-import { color, fontSize, fontWeight, lineHeight, radius, text } from '@/theme/tokens';
+import { color, fontSize, fontWeight, lineHeight, radius, space, surface, text } from '@/theme/tokens';
 
 export default function ArticleDetailScreen() {
   const { token } = useAuth();
@@ -74,13 +74,13 @@ export default function ArticleDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#FFFFFF', padding: 16 },
+  page: { flex: 1, backgroundColor: surface.canvas, padding: space[4] },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   title: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: text.primary },
   meta: { marginTop: 8, color: text.tertiary },
   senti: { marginTop: 8, color: text.secondary },
   note: { marginTop: 8, color: text.tertiary },
-  body: { marginTop: 16, fontSize: 15, lineHeight: lineHeight.lg, color: text.secondary },
+  body: { marginTop: 16, fontSize: fontSize.sm, lineHeight: lineHeight.lg, color: text.secondary },
   button: {
     marginTop: 18,
     height: 44,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonText: { color: '#FFFFFF', fontWeight: fontWeight.bold },
+  buttonText: { color: text.inverse, fontWeight: fontWeight.bold },
   error: { color: color.error[700] },
 });
 

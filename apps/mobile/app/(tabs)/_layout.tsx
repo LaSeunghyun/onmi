@@ -7,7 +7,6 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
@@ -22,8 +21,6 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
       }}>
       <Tabs.Screen
@@ -32,12 +29,12 @@ export default function TabLayout() {
           title: '리포트',
           tabBarIcon: ({ color }) => <TabBarIcon name="newspaper-o" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/(tabs)/two" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
-                    name="gear"
-                    size={25}
+                    name="tags"
+                    size={22}
                     color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
@@ -50,7 +47,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="two"
         options={{
-          title: '키워드',
+          title: '키워드 관리',
+          href: null,
           tabBarIcon: ({ color }) => <TabBarIcon name="tags" color={color} />,
         }}
       />
@@ -60,13 +58,13 @@ export default function TabLayout() {
           title: '감시종목',
           tabBarIcon: ({ color }) => <TabBarIcon name="line-chart" color={color} />,
           headerRight: () => (
-            <Link href={"/stock/add" as any} asChild>
+            <Link href="/(tabs)/search" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
-                    name="plus"
-                    size={22}
-                    color={Colors[useColorScheme() ?? 'light'].text}
+                    name="search"
+                    size={20}
+                    color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -78,7 +76,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: '검색',
+          title: '종목 검색',
+          href: null,
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       />
