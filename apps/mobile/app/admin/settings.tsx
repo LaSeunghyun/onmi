@@ -10,7 +10,7 @@ import {
   validatePasswordLength,
   validatePasswordRequired,
 } from '@/lib/validation';
-import { color, fontSize, fontWeight, space } from '@/theme/tokens';
+import { color, fontSize, fontWeight, space, text } from '@/theme/tokens';
 
 export default function AdminSettingsScreen() {
   const { admin, changePassword } = useAdminAuth();
@@ -102,10 +102,10 @@ export default function AdminSettingsScreen() {
 
 const styles = StyleSheet.create({
   page: { paddingBottom: space[8], gap: space[3] },
-  pageTitle: { fontSize: 36, fontWeight: fontWeight.bold, color: '#1E293B', lineHeight: 42 },
-  subtitle: { color: '#64748B', fontSize: fontSize.base, marginTop: -8, marginBottom: 4 },
+  pageTitle: { fontSize: 36, fontWeight: fontWeight.bold, color: text.primary, lineHeight: 42 },
+  subtitle: { color: text.secondary, fontSize: fontSize.base, marginTop: -8, marginBottom: 4 },
   formCard: { maxWidth: 880 },
-  sectionTitle: { fontSize: 30, fontWeight: fontWeight.bold, color: '#1E293B', marginBottom: space[2] },
+  sectionTitle: { fontSize: 30, fontWeight: fontWeight.bold, color: text.primary, marginBottom: space[2] },
   inputSpacing: { marginBottom: space[2] },
   ok: { color: color.success[700], marginTop: 4 },
   error: { color: color.error[700], marginTop: 4 },

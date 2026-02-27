@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 
 import { type AdminAuditLog, adminListAuditLogs } from '@/lib/admin';
 import { ApiError } from '@/lib/api';
-import { Card } from '@/components/ui';
+import { Card, ErrorBanner } from '@/components/ui';
 import { useAdminAuth } from '@/lib/adminAuth';
 import { color, fontSize, fontWeight, radius, space, text } from '@/theme/tokens';
 
@@ -78,7 +78,7 @@ export default function AdminAuditScreen() {
             </View>
           ))
         )}
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <ErrorBanner message={error} />
       </Card>
     </ScrollView>
   );
@@ -86,18 +86,17 @@ export default function AdminAuditScreen() {
 
 const styles = StyleSheet.create({
   page: { paddingBottom: space[8], gap: space[3] },
-  pageTitle: { fontSize: 36, fontWeight: fontWeight.bold, color: '#1E293B', lineHeight: 42 },
-  subtitle: { color: '#64748B', fontSize: fontSize.base, marginTop: -8, marginBottom: 4 },
+  pageTitle: { fontSize: 36, fontWeight: fontWeight.bold, color: text.primary, lineHeight: 42 },
+  subtitle: { color: text.secondary, fontSize: fontSize.base, marginTop: -8, marginBottom: 4 },
   kpiGrid: { flexDirection: 'row', gap: 14, flexWrap: 'wrap' },
   kpiCard: { width: 188, minHeight: 114, justifyContent: 'center' },
-  kpiNumber: { fontSize: 36, fontWeight: fontWeight.bold, color: '#1E293B' },
-  kpiLabel: { color: '#64748B', fontSize: fontSize.sm },
+  kpiNumber: { fontSize: 36, fontWeight: fontWeight.bold, color: text.primary },
+  kpiLabel: { color: text.secondary, fontSize: fontSize.sm },
   sectionCard: { maxWidth: 980 },
   title: { fontSize: 24, fontWeight: fontWeight.bold, color: text.primary },
   row: { borderWidth: 1, borderColor: color.neutral[200], borderRadius: radius.sm, padding: 10, gap: 2 },
   action: { fontWeight: fontWeight.bold, color: text.primary },
   meta: { color: text.secondary, fontSize: fontSize.xs },
-  error: { color: color.error[700], marginTop: 4 },
   loadingWrap: { flexDirection: 'row', alignItems: 'center', gap: space[2], paddingVertical: space[4] },
   loadingText: { color: color.neutral[600], fontSize: fontSize.sm },
   emptyText: { color: text.secondary, fontSize: fontSize.sm, paddingVertical: space[4] },

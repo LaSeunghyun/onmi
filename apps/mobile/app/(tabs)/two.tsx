@@ -8,12 +8,12 @@ import {
   StyleSheet,
   Switch,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { Input } from '@/components/ui';
 import { createKeyword, deleteKeyword, Keyword, listKeywords, updateKeyword } from '@/lib/keywords';
 import { border, color, fontSize, fontWeight, radius, space, surface, text } from '@/theme/tokens';
 
@@ -127,7 +127,7 @@ export default function KeywordsScreen() {
   return (
     <View style={styles.page}>
       <View style={styles.topBar}>
-        <TextInput
+        <Input
           style={styles.search}
           placeholder="키워드 검색"
           value={query}
@@ -137,7 +137,7 @@ export default function KeywordsScreen() {
       </View>
 
       <View style={styles.addRow}>
-        <TextInput
+        <Input
           style={styles.addInput}
           placeholder="키워드 추가"
           value={newText}

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useAdminAuth } from '@/lib/adminAuth';
-import { color, fontSize, fontWeight, radius, space, text } from '@/theme/tokens';
+import { admin, color, fontSize, fontWeight, radius, space, text } from '@/theme/tokens';
 
 export default function AdminLayout() {
   const { loading, token, signOut } = useAdminAuth();
@@ -94,31 +94,31 @@ export default function AdminLayout() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, flexDirection: 'row', backgroundColor: '#DCE1E8' },
+  page: { flex: 1, flexDirection: 'row', backgroundColor: admin.pageBg },
   sidebar: {
     width: 198,
-    backgroundColor: '#1F2E46',
+    backgroundColor: admin.sidebar.bg,
     paddingHorizontal: 10,
     paddingTop: 18,
     paddingBottom: 12,
     borderRightWidth: 1,
-    borderRightColor: '#2B3B57',
+    borderRightColor: admin.sidebar.border,
   },
   brandWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 22, paddingHorizontal: 8 },
   brandIcon: {
     width: 36,
     height: 36,
     borderRadius: radius.full,
-    backgroundColor: '#0EA5E9',
+    backgroundColor: admin.sidebar.brandAccent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandIconText: { color: '#FFFFFF', fontWeight: fontWeight.bold },
-  brandTitle: { color: '#FFFFFF', fontWeight: fontWeight.bold, fontSize: fontSize.base },
-  brandSub: { color: '#8EA0BF', fontSize: fontSize.xs },
-  sectionLabel: { color: '#7E91AF', fontSize: 11, fontWeight: fontWeight.semibold, marginBottom: 8, paddingHorizontal: 8 },
+  brandIconText: { color: text.inverse, fontWeight: fontWeight.bold },
+  brandTitle: { color: text.inverse, fontWeight: fontWeight.bold, fontSize: fontSize.base },
+  brandSub: { color: admin.sidebar.brandSub, fontSize: fontSize.xs },
+  sectionLabel: { color: admin.sidebar.sectionLabel, fontSize: 11, fontWeight: fontWeight.semibold, marginBottom: 8, paddingHorizontal: 8 },
   navLink: {
-    color: '#D4DEEE',
+    color: admin.sidebar.navText,
     height: 36,
     borderRadius: radius.md,
     paddingHorizontal: 12,
@@ -127,10 +127,10 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   navLinkActive: {
-    backgroundColor: '#06B6D4',
-    color: '#FFFFFF',
+    backgroundColor: admin.sidebar.navActiveBg,
+    color: text.inverse,
     fontWeight: fontWeight.semibold,
-    shadowColor: '#06B6D4',
+    shadowColor: admin.sidebar.navActiveBg,
     shadowOpacity: 0.35,
     shadowRadius: 10,
   },
@@ -138,9 +138,9 @@ const styles = StyleSheet.create({
   topbar: {
     height: 56,
     paddingHorizontal: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: admin.topbar.bg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: admin.topbar.border,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -159,17 +159,17 @@ const styles = StyleSheet.create({
   },
   topIcons: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   bell: { fontSize: 18 },
-  avatar: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: '#0EA5E9' },
+  avatar: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: admin.sidebar.brandAccent },
   content: { flex: 1, minHeight: 400, paddingHorizontal: 22, paddingVertical: 18 },
   logoutBtn: {
     marginTop: 'auto',
     height: 36,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: '#32435F',
+    borderColor: admin.sidebar.logoutBorder,
     alignItems: 'flex-start',
     justifyContent: 'center',
     paddingHorizontal: 12,
   },
-  logoutText: { color: '#D4DEEE', fontWeight: fontWeight.medium, fontSize: fontSize.sm },
+  logoutText: { color: admin.sidebar.navText, fontWeight: fontWeight.medium, fontSize: fontSize.sm },
 });

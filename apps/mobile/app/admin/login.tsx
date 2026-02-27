@@ -98,7 +98,7 @@ export default function AdminLoginScreen() {
           ) : null}
           {submitting ? (
             <View style={styles.loadingWrap}>
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={text.inverse} />
             </View>
           ) : (
             <Button label="로그인" variant="primary" onPress={onSubmit} disabled={submitting} style={styles.submitBtn} />

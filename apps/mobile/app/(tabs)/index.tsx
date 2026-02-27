@@ -13,6 +13,7 @@ import {
 
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { Button, Card } from '@/components/ui';
 import { addDays, formatKstLabel, toKstDateString } from '@/lib/date';
 import { getReport, ReportItem, ReportResponse } from '@/lib/report';
 import { color, border, fontSize, fontWeight, radius, space, surface, text } from '@/theme/tokens';
@@ -140,9 +141,7 @@ export default function ReportScreen() {
         <View style={styles.center}>
           <Text style={styles.emptyTitle}>오늘은 관련 뉴스가 없어요</Text>
           <Text style={styles.emptyDesc}>키워드나 날짜를 바꿔보세요.</Text>
-          <Pressable style={styles.retry} onPress={load}>
-            <Text style={styles.retryText}>새로고침</Text>
-          </Pressable>
+          <Button label="새로고침" variant="secondary" size="md" onPress={load} style={styles.retry} />
         </View>
       ) : (
         <FlatList
@@ -178,33 +177,35 @@ function sentimentLabel(s: string | null) {
 function ArticleCard({ item, onPress }: { item: ReportItem; onPress: () => void }) {
   const senti = sentimentLabel(item.sentiment);
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <View style={styles.cardTopRow}>
-        {item.keyword_text ? (
-          <View style={styles.keywordPill}>
-            <Text style={styles.keywordPillText}>{item.keyword_text}</Text>
+    <Pressable onPress={onPress}>
+      <Card style={styles.card}>
+        <View style={styles.cardTopRow}>
+          {item.keyword_text ? (
+            <View style={styles.keywordPill}>
+              <Text style={styles.keywordPillText}>{item.keyword_text}</Text>
+            </View>
+          ) : null}
+          <View style={styles.sentiRow}>
+            <FontAwesome name={senti.icon} size={14} color={text.tertiary} />
+            <Text style={styles.sentiText}>{senti.text}</Text>
           </View>
-        ) : null}
-        <View style={styles.sentiRow}>
-          <FontAwesome name={senti.icon} size={14} color={text.tertiary} />
-          <Text style={styles.sentiText}>{senti.text}</Text>
         </View>
-      </View>
 
-      <Text style={styles.cardTitle} numberOfLines={2}>
-        {item.title}
-      </Text>
-
-      <Text style={styles.cardMeta} numberOfLines={1}>
-        {item.source_name ?? '출처 미상'}
-        {item.translation_status && item.translation_status !== 'not_needed' ? ' · 번역됨' : ''}
-      </Text>
-
-      {item.summary_ko ? (
-        <Text style={styles.cardBody} numberOfLines={3}>
-          {item.summary_ko}
+        <Text style={styles.cardTitle} numberOfLines={2}>
+          {item.title}
         </Text>
-      ) : null}
+
+        <Text style={styles.cardMeta} numberOfLines={1}>
+          {item.source_name ?? '출처 미상'}
+          {item.translation_status && item.translation_status !== 'not_needed' ? ' · 번역됨' : ''}
+        </Text>
+
+        {item.summary_ko ? (
+          <Text style={styles.cardBody} numberOfLines={3}>
+            {item.summary_ko}
+          </Text>
+        ) : null}
+      </Card>
     </Pressable>
   );
 }
@@ -274,16 +275,9 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space[6] },
   emptyTitle: { fontSize: fontSize.base, fontWeight: fontWeight.bold, color: text.primary },
   emptyDesc: { marginTop: 6, color: text.tertiary },
-  retry: { marginTop: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.md, backgroundColor: color.neutral[100] },
-  retryText: { color: text.primary, fontWeight: fontWeight.semibold },
+  retry: { marginTop: 12 },
   list: { paddingHorizontal: space[3], paddingBottom: space[6], gap: space[3] },
-  card: {
-    borderRadius: radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: border.hairline,
-    backgroundColor: surface.canvas,
-    padding: space[4],
-  },
+  card: {},
   cardTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   keywordPill: { backgroundColor: color.primary[500], paddingHorizontal: space[3], paddingVertical: space[1], borderRadius: radius.sm },
   keywordPillText: { color: text.inverse, fontSize: fontSize.xs, fontWeight: fontWeight.bold },
