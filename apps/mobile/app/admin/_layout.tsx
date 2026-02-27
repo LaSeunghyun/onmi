@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useAdminAuth } from '@/lib/adminAuth';
-import { color, fontSize, fontWeight, radius, text } from '@/theme/tokens';
+import { admin, color, fontSize, fontWeight, radius, text } from '@/theme/tokens';
 
 type MCIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -26,9 +26,9 @@ const ADMIN_ITEMS: NavItemDef[] = [
   { href: '/admin/settings', label: '설정', icon: 'cog-outline', key: 'settings' },
 ];
 
-const ACTIVE_COLOR = '#22D3EE';
-const INACTIVE_ICON_COLOR = '#64748B';
-const INACTIVE_TEXT_COLOR = '#94A3B8';
+const ACTIVE_COLOR = admin.sidebar.navActiveBg;
+const INACTIVE_ICON_COLOR = admin.sidebar.navText;
+const INACTIVE_TEXT_COLOR = admin.sidebar.navText;
 
 export default function AdminLayout() {
   const { loading, token, signOut } = useAdminAuth();
@@ -133,15 +133,15 @@ export default function AdminLayout() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, flexDirection: 'row', backgroundColor: '#F1F5F9' },
+  page: { flex: 1, flexDirection: 'row', backgroundColor: admin.pageBg },
   sidebar: {
     width: 210,
-    backgroundColor: '#0F172A',
+    backgroundColor: admin.sidebar.bg,
     paddingHorizontal: 12,
     paddingTop: 20,
     paddingBottom: 16,
     borderRightWidth: 1,
-    borderRightColor: '#1E293B',
+    borderRightColor: admin.sidebar.border,
   },
   brandWrap: {
     flexDirection: 'row',
@@ -154,14 +154,14 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radius.full,
-    backgroundColor: '#0EA5E9',
+    backgroundColor: admin.sidebar.brandAccent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandTitle: { color: '#F8FAFC', fontWeight: fontWeight.bold, fontSize: fontSize.base },
-  brandSub: { color: '#475569', fontSize: fontSize.xs },
+  brandTitle: { color: text.inverse, fontWeight: fontWeight.bold, fontSize: fontSize.base },
+  brandSub: { color: admin.sidebar.brandSub, fontSize: fontSize.xs },
   sectionLabel: {
-    color: '#334155',
+    color: admin.sidebar.sectionLabel,
     fontSize: 10,
     fontWeight: fontWeight.semibold,
     letterSpacing: 1,
@@ -196,9 +196,9 @@ const styles = StyleSheet.create({
   topbar: {
     height: 56,
     paddingHorizontal: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: admin.topbar.bg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: admin.topbar.border,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -216,18 +216,18 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   topIcons: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  avatar: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: '#0EA5E9' },
+  avatar: { width: 32, height: 32, borderRadius: radius.full, backgroundColor: admin.sidebar.brandAccent },
   content: { flex: 1, minHeight: 400, paddingHorizontal: 24, paddingVertical: 20 },
   logoutBtn: {
     marginTop: 'auto',
     height: 36,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: admin.sidebar.logoutBorder,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 12,
   },
-  logoutText: { color: '#475569', fontWeight: fontWeight.medium, fontSize: fontSize.sm },
+  logoutText: { color: admin.sidebar.navText, fontWeight: fontWeight.medium, fontSize: fontSize.sm },
 });

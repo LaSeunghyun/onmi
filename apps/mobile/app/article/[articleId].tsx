@@ -1,9 +1,10 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, StyleSheet, Text, View } from 'react-native';
 
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { Button } from '@/components/ui';
 import { ArticleDetail, getArticle } from '@/lib/report';
 import { color, fontSize, fontWeight, lineHeight, radius, space, surface, text } from '@/theme/tokens';
 
@@ -66,30 +67,20 @@ export default function ArticleDetailScreen() {
 
       <Text style={styles.body}>{data.summary_ko ?? ''}</Text>
 
-      <Pressable style={styles.button} onPress={() => Linking.openURL(data.original_url)}>
-        <Text style={styles.buttonText}>원문 보기</Text>
-      </Pressable>
+      <Button label="원문 보기" variant="primary" onPress={() => Linking.openURL(data.original_url)} style={styles.button} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: surface.canvas, padding: space[4] },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space[6] },
   title: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: text.primary },
-  meta: { marginTop: 8, color: text.tertiary },
-  senti: { marginTop: 8, color: text.secondary },
-  note: { marginTop: 8, color: text.tertiary },
-  body: { marginTop: 16, fontSize: fontSize.sm, lineHeight: lineHeight.lg, color: text.secondary },
-  button: {
-    marginTop: 18,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: color.primary[500],
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: { color: text.inverse, fontWeight: fontWeight.bold },
+  meta: { marginTop: space[2], color: text.tertiary },
+  senti: { marginTop: space[2], color: text.secondary },
+  note: { marginTop: space[2], color: text.tertiary },
+  body: { marginTop: space[4], fontSize: fontSize.sm, lineHeight: lineHeight.lg, color: text.secondary },
+  button: { marginTop: space[4], height: 44, borderRadius: radius.md },
   error: { color: color.error[700] },
 });
 

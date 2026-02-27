@@ -142,6 +142,25 @@ export const disclosure = {
   negative: color.error[600],
 } as const;
 
+/** 어드민 사이드바/레이아웃 전용 팔레트 */
+export const admin = {
+  pageBg: '#DCE1E8',
+  sidebar: {
+    bg: '#1F2E46',
+    border: '#2B3B57',
+    brandAccent: '#0EA5E9',
+    brandSub: '#8EA0BF',
+    sectionLabel: '#7E91AF',
+    navText: '#D4DEEE',
+    navActiveBg: '#06B6D4',
+    logoutBorder: '#32435F',
+  },
+  topbar: {
+    bg: surface.canvas,
+    border: color.neutral[200],
+  },
+} as const;
+
 export const semantic = {
   light: {
     surface: surface.canvas,

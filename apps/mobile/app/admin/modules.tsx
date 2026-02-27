@@ -117,12 +117,12 @@ export default function AdminModulesScreen() {
 
 const styles = StyleSheet.create({
   page: { paddingBottom: space[8], gap: space[3] },
-  pageTitle: { fontSize: 36, fontWeight: fontWeight.bold, color: '#1E293B', lineHeight: 42 },
-  subtitle: { color: '#64748B', fontSize: fontSize.base, marginTop: -8, marginBottom: 4 },
+  pageTitle: { fontSize: 36, fontWeight: fontWeight.bold, color: text.primary, lineHeight: 42 },
+  subtitle: { color: text.secondary, fontSize: fontSize.base, marginTop: -8, marginBottom: 4 },
   kpiGrid: { flexDirection: 'row', gap: 14, flexWrap: 'wrap' },
   kpiCard: { width: 188, minHeight: 114, justifyContent: 'center' },
-  kpiNumber: { fontSize: 36, fontWeight: fontWeight.bold, color: '#1E293B' },
-  kpiLabel: { color: '#64748B', fontSize: fontSize.sm },
+  kpiNumber: { fontSize: 36, fontWeight: fontWeight.bold, color: text.primary },
+  kpiLabel: { color: text.secondary, fontSize: fontSize.sm },
   title: { fontSize: 24, fontWeight: fontWeight.bold, color: text.primary },
   sectionCard: { maxWidth: 980 },
   input: { height: 40 },
